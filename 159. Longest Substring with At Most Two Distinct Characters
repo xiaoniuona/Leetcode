@@ -1,0 +1,57 @@
+Given a string, find the length of the longest substring T that contains at most 2 distinct characters.
+
+For example, Given s = “eceba”,
+T is "ece" which its length is 3.
+
+
+/*
+1）在已有的两个字符中，如何选择该去掉其所有出现的字符？
+窗口起始处的字符是一定会被去掉的，但是否总是应该选择这个字符然后去掉其所有出现么？以“abac”为例，可以发现当扫描到c时，a是一定会被去掉的，但是如果去掉所有出现过的a，那么最后只剩下"c"了。这时应该是去掉所有出现的b，顺便去掉了最开始的a，从而得到"ac"。由此观之，选择标准应该是字符的最后出现的位置，最后出现的位置越左（早），则其出现被全部删除后所减小的长度越少。因此，应该删光最后出现位置在最左的字符。
+
+最优的解法应该是维护一个sliding window，指针变量start指向sliding window的起始位置，end指向另个一个字符在sliding window的最后一个，用于定位start的下一个跳转位置。内部逻辑就是
+1）如果当前字符跟前一个字符是一样的，直接继续。
+2）如果不一样，则需要判断当前字符跟j是不是一样的
+a）一样的话sliding window左边不变，右边继续增加，但是j的位置需要调整到k-1。
+b）不一样的话，sliding window的左侧变为end的下一个字符（也就是去掉包含j指向的字符的区间），end的位置也需要调整到k-1。
+
+在对i进行调整的时候（2.b），需要更新maxLen。
+*/
+/*
+public class Solution {
+    public int lengthOfLongestSubstringTwoDistinct(String s) {
+        if(s.length()<=1) return s.length();
+        int length=0;
+        int start=0, end=-1;
+        for(int k=1; k<s.length(); k++){
+            if(s.charAt(k)==s.charAt(k-1)) continue;
+            if(end!=-1 && s.charAt(k)!=s.charAt(end)){
+                length=Math.max(length,k-start);
+                start=end+1;
+            }
+            end=k-1;
+        }
+        length=Math.max(length,s.length()-start); //最后返回的时候，要考虑s.length()-start这种情况，也就是字符串读取到最后而没有触发（2.a）
+        return length;
+    }
+}*/
+public class Solution{
+    public int lengthOfLongestSubstringTwoDistinct(String s) {
+        HashMap<Character,Integer> map=new HashMap<Character,Integer>();
+        int start=0;
+        int maxLen=0;
+        for(int j=0; j<s.length(); j++){
+            if(!map.containsKey(s.charAt(j)) && map.size()==2){
+                    int end=s.length();
+                    for(Character c:map.keySet()){
+                        end=Math.min(end,map.get(c));
+                    }
+                    maxLen=Math.max(maxLen,j-start);
+                    map.remove(s.charAt(end));
+                    start=end+1;
+            }
+            map.put(s.charAt(j),j);
+        }
+        maxLen=Math.max(maxLen,s.length()-start);
+        return maxLen;
+    }
+}
