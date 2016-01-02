@@ -1,0 +1,60 @@
+An abbreviation of a word follows the form <first letter><number><last letter>. Below are some examples of word abbreviations:
+a) it                      --> it    (no abbreviation)
+
+     1
+b) d|o|g                   --> d1g
+              1    1  1
+     1---5----0----5--8
+c) i|nternationalizatio|n  --> i18n
+              1
+     1---5----0
+d) l|ocalizatio|n          --> l10n
+Assume you have a dictionary and given a word, find whether its abbreviation is unique in the dictionary. A word's abbreviation is unique if no other word from the dictionary has the same abbreviation.
+
+Example: 
+Given dictionary = [ "deer", "door", "cake", "card" ]
+isUnique("dear") -> false
+isUnique("cart") -> true
+isUnique("cane") -> false
+
+public class ValidWordAbbr {
+    String[] dictionary;
+    Map<String,List<String>> abbr_dic=new HashMap<String,List<String>>(); // need a abbreviation dictionary to look up
+    
+    public ValidWordAbbr(String[] dictionary) {
+        this.dictionary=dictionary;
+        //construct the abbreviation dictionary
+        for(String s:dictionary){   
+            String abbr=getAbbr(s);
+            List<String> tmp;
+            if(!abbr_dic.containsKey(abbr)){
+                tmp=new LinkedList<String>();
+            }
+            else{
+                tmp=abbr_dic.get(abbr);
+            }
+            tmp.add(s);
+            abbr_dic.put(abbr,tmp);
+        }
+    }
+
+    public boolean isUnique(String word) {
+        String w=getAbbr(word);
+        if(!abbr_dic.containsKey(w)) return true; // if the dictionary doesn't contain the abbr, it's unique
+        else{
+            List<String> tmp=abbr_dic.get(w);
+            for(String s : tmp){
+                if(!s.equals(word)) return false; // if the dictionary contains the input word, maybe repeat more than once
+            }
+            return true;
+        }
+    }
+    
+    public String getAbbr(String s){
+        if(s.length()<=2) return s;
+        StringBuilder str=new StringBuilder();
+        str.append(s.charAt(0)).append(s.length()-2).append(s.charAt(s.length()-1));
+        return str.toString();
+    }
+}
+
