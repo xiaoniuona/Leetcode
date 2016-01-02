@@ -1,0 +1,56 @@
+You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -,
+you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore
+the other person will be the winner.
+Write a function to determine if the starting player can guarantee a win.
+
+For example, given s = "++++", return true. The starting player can guarantee a win by flipping the middle "++" to become "+--+".
+
+Follow up:
+Derive your algorithm's runtime complexity.
+
+/*
+At first glance, backtracking seems to be the only feasible solution to this problem. We can basically try every possible move for the first player (Let's call him 1P from now on), and recursively check if the second player 2P has any chance to win. If 2P is guaranteed to lose, then we know the current move 1P takes must be the winning move.
+
+public class Solution {
+    public boolean canWin(String s) {
+        if(s==null || s.length()<2) return false;
+        char[] arr=s.toCharArray();
+        return canWinHelper(arr);
+    }
+    public boolean canWinHelper(char[] arr){
+        for(int i=0; i<arr.length-1; i++){
+            if(arr[i]=='+' && arr[i+1]=='+'){
+                arr[i]='-';
+                arr[i+1]='-';
+                boolean win=!canWinHelper(arr);
+                arr[i]='+';
+                arr[i+1]='+';
+                if(win) return true;
+            }
+        }
+        return false;
+    }
+}*/
+// Using a hashmap to memorise the tmp results to save some time. Time complexity is still O(n!!)
+public class Solution{
+    public boolean canWin(String s){
+        if(s==null || s.length()<2) return false;
+        HashMap<String,Boolean> map=new HashMap<String,Boolean>();
+        return helper(s,map);
+     }
+     
+     public boolean helper(String s, HashMap<String,Boolean> map){
+         if(map.containsKey(s)) return map.get(s);
+         for(int i=0; i<s.length()-1; i++){
+             if(s.charAt(i)=='+' && s.charAt(i+1)=='+'){
+                 String fliped=s.substring(0,i)+"--"+s.substring(i+2);
+                 if(!helper(fliped,map)){
+                     map.put(s,true);
+                     return true;
+                 }
+             }
+         }
+         map.put(s,false);
+         return false;
+     }
+}
