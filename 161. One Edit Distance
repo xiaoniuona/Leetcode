@@ -1,0 +1,27 @@
+Given two strings S and T, determine if they are both one edit distance apart.
+
+
+
+public class Solution {
+    public boolean isOneEditDistance(String s, String t) {
+        int len1=s.length(), len2=t.length();
+        if(Math.abs(len1-len2)>=2) return false;
+        if(len1-len2==1) return isOneLengthDiff(s,t);
+        else if(len2-len1==1) return isOneLengthDiff(t,s);
+        else return isSameLength(s,t);
+    }
+    public boolean isOneLengthDiff(String s, String t){
+        for(int i=0; i<t.length(); i++){
+            if(s.charAt(i)==t.charAt(i)) continue;
+            return s.substring(i+1).equals(t.substring(i)); //has to be .equals method, not "=="!!! String couldn't use "=="
+        }
+        return true; //only the last character of s is different
+    }
+    public boolean isSameLength(String s, String t){
+        for(int i=0; i<s.length(); i++){
+            if(s.charAt(i)==t.charAt(i)) continue;
+            return s.substring(i+1).equals(t.substring(i+1));
+        }
+        return false; // 2 strings are the same
+    }
+}
