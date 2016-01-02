@@ -1,0 +1,31 @@
+Given a sorted integer array where the range of elements are [lower, upper] inclusive, return its missing ranges.
+For example, given [0, 1, 3, 50, 75], lower = 0 and upper = 99, return ["2", "4->49", "51->74", "76->99"].
+
+
+public class Solution {
+    public List<String> findMissingRanges(int[] nums, int lower, int upper) {
+        List<String> result=new ArrayList<String>();
+        //when input nums is empty
+        if(nums==null || nums.length==0){
+            if(upper==lower) result.add(String.valueOf(upper));
+            else result.add(getRanges(lower-1,upper+1));
+            return result;
+        } 
+        
+        int start=lower-1;
+        for(int i=0; i<=nums.length-1; i++){
+            if(nums[i]-start>=2) result.add(getRanges(start,nums[i]));
+            start=nums[i];
+        }
+        if(nums[nums.length-1]<upper) result.add(getRanges(nums[nums.length-1],upper+1));
+        return result;
+    }
+    
+    
+    public String getRanges(int start, int end){
+        if(end-start==2) return String.valueOf(end-1);
+        StringBuilder sb=new StringBuilder();
+        sb.append(start+1).append("->").append(end-1);
+        return sb.toString();
+    }
+}
