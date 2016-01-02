@@ -1,0 +1,87 @@
+You want to build a house on an?empty?land which reaches all buildings in the shortest amount of distance. You can only move up, down, left and right. You are given a 2D grid of values?0,?1?or?2, where:
+?Each?0?marks an empty land which you can pass by freely.
+?Each?1?marks a building which you cannot pass through.
+?Each?2?marks an obstacle which you cannot pass through.
+For example, given three buildings at?(0,0),?(0,4),?(2,2), and an obstacle at?(0,2):
+1 - 0 - 2 - 0 - 1
+|   |   |   |   |
+0 - 0 - 0 - 0 - 0
+|   |   |   |   |    
+0 - 0 - 1 - 0 - 0
+
+The point?(1,2)?is an ideal empty land to build a house, as the total travel distance of 3+3+1=7 is minimal. So return 7.
+Note:
+There will be at least one building. If it is not possible to build such house according to the above rules, return -1.
+
+
+public class Solution {
+    private class Cell{
+        public int x;
+        public int y;
+        public int steps;
+        
+        public Cell(int x, int y, int step){
+            this.x=x;
+            this.y=y;
+            this.steps=step;
+        }
+    }
+    
+    public int shortestDistance(int[][] grid) {
+        int min=Integer.MAX_VALUE;
+        int house=0;
+        int row=grid.length;
+        int col=grid[0].length;
+        
+        for(int i=0; i<row; i++){
+            for(int j=0; j<col; j++){
+                if(grid[i][j]==1) house++;
+            }
+        }
+        
+        for(int i=0; i<row; i++){
+            for(int j=0; j<col; j++){
+                if(grid[i][j]==0){
+                    boolean[][] visited=new boolean[row][col];
+                    Queue<Cell> q=new LinkedList<Cell>();
+                    q.add(new Cell(i,j,0));
+                    visited[i][j]=true;
+                    min=Math.min(min,bfs(grid,visited,q,house));
+                }
+            }
+        }
+        // if can't find all existing houses, return -1
+        return min==Integer.MAX_VALUE?-1:min;
+    }
+    
+    public int bfs(int[][] grid, boolean[][] visited, Queue<Cell> q, int house){
+        int row=grid.length;
+        int col=grid[0].length;
+        int house_count=0;
+        int sum=0;
+
+        while(!q.isEmpty()){
+            Cell cel=q.poll();
+            // Traverse four surrounding cells
+            for(int m=-1; m<=1; m++){
+                for(int n=-1; n<=1; n++){
+                    // Current cell itself or out of boundary or has been visited
+                    if(Math.abs(m)==Math.abs(n) || cel.x+m<0 || cel.x+m>=row || cel.y+n<0 || cel.y+n>=col || visited[cel.x+m][cel.y+n]) continue;
+                     // Find an unmarked house 
+                    if(grid[cel.x+m][cel.y+n]==1){
+                        sum+=cel.steps+1;
+                        house_count++;
+                        visited[cel.x+m][cel.y+n]=true;
+                    }
+                    
+                    else if(grid[cel.x+m][cel.y+n]==0){
+                        visited[cel.x+m][cel.y+n]=true;
+                        q.add(new Cell(cel.x+m,cel.y+n,cel.steps+1));
+                    }
+                }
+            }
+        }
+        // if can't find all existing houses, return Integer.MAV_VALUE
+        return house_count==house?sum:Integer.MAX_VALUE;
+    }
+}
